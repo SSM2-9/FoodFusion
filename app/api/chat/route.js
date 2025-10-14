@@ -12,7 +12,7 @@ export async function POST(req) {
   const genAI = new GoogleGenerativeAI(apiKey);
 
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-2.0-flash",
     systemInstruction: "You are a chatbot designed to help people with making delicious recipes"
   });
 
