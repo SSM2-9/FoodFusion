@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Button, Stack, TextField, Tooltip } from '@mui/material';
-import { useEffect, useState, useRef, handleKeyPress } from 'react';
+import { useEffect, useState, useRef } from 'react';
 
 export default function Home() {
   const [messages, setMessages] = useState([
@@ -37,7 +37,7 @@ export default function Home() {
       }
   
       const data = await response.json();
-      console.log('Response Data:', data); // Log the data to verify its content
+      console.log('Response Data:', data);
   
       const text = data.response || "No content returned";
   
@@ -56,7 +56,14 @@ export default function Home() {
       setIsLoading(false);
     }
   };
-4
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
@@ -76,7 +83,6 @@ export default function Home() {
         backgroundBlendMode: 'overlay',
       }}
     >
-
       <Stack
         direction={'column'}
         width="100%"
@@ -109,6 +115,7 @@ export default function Home() {
                 color="white"
                 borderRadius={16}
                 p={3}
+                sx={{ whiteSpace: 'pre-wrap' }}
               >
                 {message.content}
               </Box>
@@ -128,11 +135,11 @@ export default function Home() {
             sx={{
               backgroundColor: 'rgba(255, 255, 255, 0.8)',
               '& .MuiInputBase-input': {
-                color: 'rgb(24, 24, 51)', // Text color
-                fontFamily: 'Poppins, sans-serif', // Font family
+                color: 'rgb(24, 24, 51)',
+                fontFamily: 'Poppins, sans-serif',
               },
               '& .MuiFormLabel-root': {
-                color: 'rgb(24, 24, 51)', // Label color
+                color: 'rgb(24, 24, 51)',
               },
               '& .MuiInputBase-root': {
                 borderRadius: 2,
@@ -155,8 +162,6 @@ export default function Home() {
           </Tooltip>
         </Stack>
       </Stack>
-      
-      
     </Box>
   );
 }

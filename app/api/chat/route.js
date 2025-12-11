@@ -12,7 +12,6 @@ export async function POST(req) {
   try {
     const data = await req.json();
     
-    // Format messages for Groq (OpenAI-compatible format)
     const messages = [
       {
         role: "system",
@@ -33,7 +32,6 @@ If a user asks something unrelated to cooking or recipes, gently guide the conve
       ...data
     ];
     
-    // Generate response using Groq
     const completion = await groq.chat.completions.create({
       messages,
       model: "llama-3.3-70b-versatile",
@@ -43,29 +41,10 @@ If a user asks something unrelated to cooking or recipes, gently guide the conve
     
     const text = completion.choices[0]?.message?.content || "No content returned";
     
-    // Post-process the response to add proper formatting
-    const formattedText = text
-      // Remove markdown bold formatting
-      .replace(/\*\*([^*]+)\*\*/g, '$1')
-      // Remove single asterisks (bullets/italics)
-      .replace(/\*/g, '')
-      // Add double line breaks around major section headers
-      .replace(/Ingredients:/gi, '\n\nIngredients:\n\n')
-      .replace(/Instructions:/gi, '\n\nInstructions:\n\n')
-      .replace(/Cooking Time:/gi, '\n\nCooking Time: ')
-      .replace(/Servings:/gi, '\nServings: ')
-      .replace(/Tips?( and Substitutions?)?:/gi, '\n\nTips and Substitutions:\n\n')
-      .replace(/Substitutions?:/gi, '\n\nSubstitutions:\n\n')
-      // Add line break before numbered steps and after
-      .replace(/(\d+)\.\s*/g, '\n\n$1. ')
-      // Add line breaks around sentences that end with periods
-      .replace(/\.\s+([A-Z])/g, '.\n\n$1')
-      // Clean up any triple or more line breaks
-      .replace(/\n{4,}/g, '\n\n')
-      // Trim whitespace
-      .trim();
+    // Remove markdown formatting
+    const cleanText = text.replace(/\*\*/g, '').replace(/\*/g, '');
     
-    return NextResponse.json({ response: formattedText }, { status: 200 });
+    return NextResponse.json({ response: cleanText }, { status: 200 });
     
   } catch (error) {
     if (error.message && error.message.toLowerCase().includes("rate")) {
