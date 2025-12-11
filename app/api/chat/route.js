@@ -45,14 +45,24 @@ If a user asks something unrelated to cooking or recipes, gently guide the conve
     
     // Post-process the response to add proper formatting
     const formattedText = text
-      .replace(/Ingredients:/gi, '\n\nIngredients:\n')
-      .replace(/Instructions:/gi, '\n\nInstructions:\n')
-      .replace(/Cooking Time:/gi, '\n\nCooking Time:')
-      .replace(/Servings:/gi, '\nServings:')
-      .replace(/Tips?:/gi, '\n\nTips:')
-      .replace(/Substitutions?:/gi, '\n\nSubstitutions:')
-      .replace(/(\d+)\.\s+/g, '\n$1. ') // Add line break before numbered steps
-      .replace(/\n{3,}/g, '\n\n') // Remove excessive line breaks (more than 2)
+      // Remove markdown bold formatting
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      // Remove single asterisks (bullets/italics)
+      .replace(/\*/g, '')
+      // Add double line breaks around major section headers
+      .replace(/Ingredients:/gi, '\n\nIngredients:\n\n')
+      .replace(/Instructions:/gi, '\n\nInstructions:\n\n')
+      .replace(/Cooking Time:/gi, '\n\nCooking Time: ')
+      .replace(/Servings:/gi, '\nServings: ')
+      .replace(/Tips?( and Substitutions?)?:/gi, '\n\nTips and Substitutions:\n\n')
+      .replace(/Substitutions?:/gi, '\n\nSubstitutions:\n\n')
+      // Add line break before numbered steps and after
+      .replace(/(\d+)\.\s*/g, '\n\n$1. ')
+      // Add line breaks around sentences that end with periods
+      .replace(/\.\s+([A-Z])/g, '.\n\n$1')
+      // Clean up any triple or more line breaks
+      .replace(/\n{4,}/g, '\n\n')
+      // Trim whitespace
       .trim();
     
     return NextResponse.json({ response: formattedText }, { status: 200 });
